@@ -37,6 +37,13 @@ const gameConfig = {
   pathPoints: [], // Will be populated with randomized path
 };
 
+// Camera for pan/zoom
+const camera = {
+  x: 0,
+  y: 0,
+  zoom: 1,
+};
+
 // Responsive canvas handling: logical coordinate system stays at gameConfig.canvasWidth/Height
 function resizeCanvas() {
   const hud = document.getElementById('hud');
@@ -63,6 +70,14 @@ function resizeCanvas() {
     // Landscape: prefer width (allow height to exceed viewport if necessary so the canvas is wide)
     cssWidth = maxCssWidth;
     cssHeight = Math.round(cssWidth / aspect);
+  }
+
+  // Set camera zoom on small landscape devices to "zoom in" and make the world appear larger
+  if (isLandscape && window.innerWidth <= 900) {
+    // scale up depending on width; clamp between 1 and 1.8
+    camera.zoom = Math.min(1.8, Math.max(1.0, window.innerWidth / 700));
+  } else {
+    camera.zoom = 1;
   }
 
   // Apply CSS size (this scales the displayed canvas while keeping logical resolution)
@@ -453,20 +468,18 @@ function update() {
 }
 
 function draw() {
+  // Clear screen
   ctx.fillStyle = '#0a1428';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // Draw title at top right
-  ctx.fillStyle = '#ff8800';
-  ctx.font = 'bold 32px Arial';
-  ctx.textAlign = 'right';
-  ctx.textBaseline = 'top';
-  ctx.shadowColor = 'rgba(255, 136, 0, 0.8)';
-  ctx.shadowBlur = 10;
-  ctx.shadowOffsetX = 0;
-  ctx.shadowOffsetY = 0;
-  ctx.fillText('🔥 Firewall Frenzy 🧱', canvas.width - 20, 15);
-  ctx.shadowColor = 'transparent';
+  // Draw world with camera transform
+  ctx.save();
+  ctx.translate(-camera.x, -camera.y);
+
+  // apply zoom around top-left of viewport in logical units
+  if (camera.zoom && camera.zoom !== 1) {
+    ctx.scale(camera.zoom, camera.zoom);
+  }
 
   // Draw path
   ctx.strokeStyle = '#00d4ff';
@@ -615,6 +628,21 @@ function draw() {
     ctx.stroke();
     ctx.globalAlpha = 1;
   });
+
+  // restore camera transform
+  ctx.restore();
+
+  // Draw title at top right (UI overlay, not affected by pan)
+  ctx.fillStyle = '#ff8800';
+  ctx.font = 'bold 32px Arial';
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'top';
+  ctx.shadowColor = 'rgba(255, 136, 0, 0.8)';
+  ctx.shadowBlur = 10;
+  ctx.shadowOffsetX = 0;
+  ctx.shadowOffsetY = 0;
+  ctx.fillText('🔥 Firewall Frenzy 🧱', canvas.width - 20, 15);
+  ctx.shadowColor = 'transparent';
 }
 
 function gameLoop() {
@@ -656,20 +684,61 @@ function gameLoop() {
 // ==================== EVENT LISTENERS ====================
 
 // Pointer events unify mouse/touch input. Convert client coords -> logical canvas coords.
+let isPanning = false;
+let panStart = { clientX: 0, clientY: 0, camX: 0, camY: 0 };
+
+function clientToWorld(clientX, clientY) {
+  const logical = clientToLogical(clientX, clientY);
+  return { x: logical.x / (camera.zoom || 1) + camera.x, y: logical.y / (camera.zoom || 1) + camera.y };
+}
+
 canvas.addEventListener('pointerdown', (e) => {
   if (gameState.waveActive) return;
-  if (!gameState.selectedTower) return;
 
-  const pos = clientToLogical(e.clientX, e.clientY);
-  placeTower(pos.x, pos.y, gameState.selectedTower.type);
-  e.preventDefault();
+  if (gameState.selectedTower) {
+    // placing tower
+    const worldPos = clientToWorld(e.clientX, e.clientY);
+    placeTower(worldPos.x, worldPos.y, gameState.selectedTower.type);
+    e.preventDefault();
+    return;
+  }
+
+  // Start panning
+  isPanning = true;
+  panStart.clientX = e.clientX;
+  panStart.clientY = e.clientY;
+  panStart.camX = camera.x;
+  panStart.camY = camera.y;
+  canvas.setPointerCapture && canvas.setPointerCapture(e.pointerId);
 });
 
 canvas.addEventListener('pointermove', (e) => {
-  if (!gameState.selectedTower) return;
-  const pos = clientToLogical(e.clientX, e.clientY);
-  gameState.selectedTower.x = pos.x;
-  gameState.selectedTower.y = pos.y;
+  if (gameState.selectedTower && !isPanning) {
+    const worldPos = clientToWorld(e.clientX, e.clientY);
+    gameState.selectedTower.x = worldPos.x;
+    gameState.selectedTower.y = worldPos.y;
+    return;
+  }
+
+  if (!isPanning) return;
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = gameConfig.canvasWidth / rect.width;
+  const scaleY = gameConfig.canvasHeight / rect.height;
+  const deltaX = (e.clientX - panStart.clientX) * scaleX;
+  const deltaY = (e.clientY - panStart.clientY) * scaleY;
+  camera.x = panStart.camX - deltaX / (camera.zoom || 1);
+  camera.y = panStart.camY - deltaY / (camera.zoom || 1);
+
+  // Clamp camera to reasonable bounds so we don't pan into infinite emptiness
+  const maxPanX = gameConfig.canvasWidth; // generous bound
+  const maxPanY = gameConfig.canvasHeight;
+  camera.x = Math.max(-maxPanX, Math.min(maxPanX, camera.x));
+  camera.y = Math.max(-maxPanY, Math.min(maxPanY, camera.y));
+});
+
+canvas.addEventListener('pointerup', (e) => {
+  isPanning = false;
+  canvas.releasePointerCapture && canvas.releasePointerCapture(e.pointerId);
 });
 
 // Prevent default touch behavior on the canvas for better touch gameplay
