@@ -48,13 +48,21 @@ function resizeCanvas() {
 
   // Maintain aspect ratio of logical canvas
   const aspect = gameConfig.canvasWidth / gameConfig.canvasHeight;
-  // Use almost full available width on small screens to make the game window larger
-  let cssWidth = Math.min(maxCssWidth, Math.max(gameConfig.canvasWidth, maxCssWidth));
+  // Use full available width on landscape devices (priority width over height)
+  const isLandscape = window.innerWidth > window.innerHeight;
+  let cssWidth = Math.min(maxCssWidth, gameConfig.canvasWidth);
   let cssHeight = Math.round(cssWidth / aspect);
 
-  if (cssHeight > maxCssHeight) {
-    cssHeight = maxCssHeight;
-    cssWidth = Math.round(cssHeight * aspect);
+  if (!isLandscape) {
+    // In portrait / non-landscape, ensure it fits within available height
+    if (cssHeight > maxCssHeight) {
+      cssHeight = maxCssHeight;
+      cssWidth = Math.round(cssHeight * aspect);
+    }
+  } else {
+    // Landscape: prefer width (allow height to exceed viewport if necessary so the canvas is wide)
+    cssWidth = maxCssWidth;
+    cssHeight = Math.round(cssWidth / aspect);
   }
 
   // Apply CSS size (this scales the displayed canvas while keeping logical resolution)
