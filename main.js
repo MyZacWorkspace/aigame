@@ -43,12 +43,13 @@ function resizeCanvas() {
   const hudHeight = hud ? hud.getBoundingClientRect().height : 80;
 
   // Preferred maximum CSS width is window width minus small margins
-  const maxCssWidth = Math.max(300, window.innerWidth - 40);
+  const maxCssWidth = Math.max(300, window.innerWidth - 20);
   const maxCssHeight = Math.max(200, window.innerHeight - hudHeight - 40);
 
   // Maintain aspect ratio of logical canvas
   const aspect = gameConfig.canvasWidth / gameConfig.canvasHeight;
-  let cssWidth = Math.min(maxCssWidth, gameConfig.canvasWidth);
+  // Use almost full available width on small screens to make the game window larger
+  let cssWidth = Math.min(maxCssWidth, Math.max(gameConfig.canvasWidth, maxCssWidth));
   let cssHeight = Math.round(cssWidth / aspect);
 
   if (cssHeight > maxCssHeight) {
