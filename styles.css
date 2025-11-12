@@ -265,3 +265,26 @@ body {
     font-size: 16px;
   }
 }
+
+/* Mobile landscape optimizations */
+@media (max-width: 900px) and (orientation: landscape) {
+  #gameContainer {
+    width: calc(100vw - 20px);
+    max-width: none;
+    margin: 0 10px;
+  }
+
+  #gameCanvas {
+    width: 100%;
+    height: auto;
+  }
+
+  .tower-btn, .action-btn {
+    padding: 14px 18px;
+    font-size: 16px;
+  }
+
+  #stats { font-size: 16px; }
+
+  #message { font-size: 16px; }
+}

@@ -37,6 +37,43 @@ const gameConfig = {
   pathPoints: [], // Will be populated with randomized path
 };
 
+// Responsive canvas handling: logical coordinate system stays at gameConfig.canvasWidth/Height
+function resizeCanvas() {
+  const hud = document.getElementById('hud');
+  const hudHeight = hud ? hud.getBoundingClientRect().height : 80;
+
+  // Preferred maximum CSS width is window width minus small margins
+  const maxCssWidth = Math.max(300, window.innerWidth - 40);
+  const maxCssHeight = Math.max(200, window.innerHeight - hudHeight - 40);
+
+  // Maintain aspect ratio of logical canvas
+  const aspect = gameConfig.canvasWidth / gameConfig.canvasHeight;
+  let cssWidth = Math.min(maxCssWidth, gameConfig.canvasWidth);
+  let cssHeight = Math.round(cssWidth / aspect);
+
+  if (cssHeight > maxCssHeight) {
+    cssHeight = maxCssHeight;
+    cssWidth = Math.round(cssHeight * aspect);
+  }
+
+  // Apply CSS size (this scales the displayed canvas while keeping logical resolution)
+  canvas.style.width = cssWidth + 'px';
+  canvas.style.height = cssHeight + 'px';
+
+  // Keep the internal drawing buffer at the logical size (no DPR scaling here to avoid coordinate confusion)
+  canvas.width = gameConfig.canvasWidth;
+  canvas.height = gameConfig.canvasHeight;
+}
+
+function clientToLogical(clientX, clientY) {
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = gameConfig.canvasWidth / rect.width;
+  const scaleY = gameConfig.canvasHeight / rect.height;
+  const x = (clientX - rect.left) * scaleX;
+  const y = (clientY - rect.top) * scaleY;
+  return { x, y };
+}
+
 // Function to generate a randomized path
 function generateRandomPath() {
   const base = gameConfig.basePathPoints;
@@ -609,26 +646,25 @@ function gameLoop() {
 
 // ==================== EVENT LISTENERS ====================
 
-canvas.addEventListener('click', (e) => {
-  if (!gameState.selectedTower || gameState.waveActive) return;
-
-  const rect = canvas.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const y = e.clientY - rect.top;
-
-  placeTower(x, y, gameState.selectedTower.type);
-});
-
-canvas.addEventListener('mousemove', (e) => {
+// Pointer events unify mouse/touch input. Convert client coords -> logical canvas coords.
+canvas.addEventListener('pointerdown', (e) => {
+  if (gameState.waveActive) return;
   if (!gameState.selectedTower) return;
 
-  const rect = canvas.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const y = e.clientY - rect.top;
-
-  gameState.selectedTower.x = x;
-  gameState.selectedTower.y = y;
+  const pos = clientToLogical(e.clientX, e.clientY);
+  placeTower(pos.x, pos.y, gameState.selectedTower.type);
+  e.preventDefault();
 });
+
+canvas.addEventListener('pointermove', (e) => {
+  if (!gameState.selectedTower) return;
+  const pos = clientToLogical(e.clientX, e.clientY);
+  gameState.selectedTower.x = pos.x;
+  gameState.selectedTower.y = pos.y;
+});
+
+// Prevent default touch behavior on the canvas for better touch gameplay
+canvas.addEventListener('touchstart', (e) => e.preventDefault(), { passive: false });
 
 document.getElementById('towerBtn').addEventListener('click', () => {
   gameState.selectedTower = { type: 'firewall', x: 0, y: 0 };
@@ -676,5 +712,14 @@ document.getElementById('helpModal').addEventListener('click', (e) => {
 // Initialize the game with first random path
 gameConfig.pathPoints = generateRandomPath();
 
-// Start the game loop
+// Setup resize handling and start
+window.addEventListener('resize', () => {
+  resizeCanvas();
+});
+window.addEventListener('orientationchange', () => {
+  setTimeout(resizeCanvas, 200);
+});
+
+// Make canvas responsive and start loop
+resizeCanvas();
 gameLoop();
