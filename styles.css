@@ -287,6 +287,27 @@ body {
     overflow-y: auto;
   }
 
+
+/* Make sure on small landscape phones the page can scroll further down to reach lower content */
+@media (max-width: 900px) and (orientation: landscape) {
+  html, body {
+    height: auto; /* allow natural height and scrolling */
+    min-height: 0;
+    align-items: flex-start; /* align container to top so scrolling exposes content below */
+    -webkit-overflow-scrolling: touch;
+  }
+
+  #gameContainer {
+    margin-bottom: 160px; /* extra bottom space so users can scroll down farther */
+    padding-bottom: 20px;
+  }
+
+  /* Ensure HUD doesn't overlap or stick to top when scrolling */
+  #hud {
+    position: relative;
+    z-index: 2;
+  }
+}
   .tower-btn, .action-btn {
     padding: 14px 18px;
     font-size: 16px;
