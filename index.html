@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Firewall Frenzy</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="gameContainer">
+    <div id="hud">
+      <div id="stats">
+        <span>💰 Credits: <span id="credits">100</span></span>
+        <span>❤️ Health: <span id="health">20</span></span>
+        <span>🌊 Wave: <span id="wave">1</span></span>
+      </div>
+      <div id="controls">
+        <button id="towerBtn" class="tower-btn">🔥 Firewall ($25)</button>
+        <button id="idsBtn" class="tower-btn">🕵️ IDS ($40)</button>
+        <button id="honeypotBtn" class="tower-btn">🪤 Honeypot ($35)</button>
+        <button id="patchBtn" class="tower-btn">⚡ Patch ($50)</button>
+        <button id="startWave" class="action-btn">▶ Start Wave</button>
+        <button id="helpBtn" class="action-btn" style="background: linear-gradient(135deg, #9b59b6, #8e44ad);">ℹ️ Tower Info</button>
+        <button id="restartBtn" class="action-btn" style="display: none; background: linear-gradient(135deg, #ff6b6b, #e94560);">🔄 Restart Game</button>
+      </div>
+      <div id="message"></div>
+    </div>
+    <canvas id="gameCanvas" width="1000" height="600"></canvas>
+  </div>
+
+  <!-- Tower Info Modal -->
+  <div id="helpModal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>🛡️ Tower Defense Guide</h2>
+        <button class="close-btn" id="closeModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="tower-info">
+          <h3>🔥 Firewall ($25)</h3>
+          <p><strong>Range:</strong> 120px | <strong>Damage:</strong> 1 | <strong>Fire Rate:</strong> 0.5/s</p>
+          <p>Your first line of defense. Blocks basic threats quickly. Great for starting waves and early game.</p>
+          <p><strong>Best against:</strong> Viruses, DDoS bots</p>
+        </div>
+
+        <div class="tower-info">
+          <h3>🕵️ Intrusion Detection System ($40)</h3>
+          <p><strong>Range:</strong> 180px | <strong>Damage:</strong> 1.5 | <strong>Fire Rate:</strong> 0.3/s</p>
+          <p>Long-range threat detector. Higher damage output and better coverage. Essential for defending critical areas.</p>
+          <p><strong>Best against:</strong> Worms, phishing packets</p>
+        </div>
+
+        <div class="tower-info">
+          <h3>🪤 Honeypot ($35)</h3>
+          <p><strong>Range:</strong> 100px | <strong>Damage:</strong> 0.5 | <strong>Fire Rate:</strong> 1/s</p>
+          <p>Lures attackers in and continuously damages them. Low damage but extremely fast attack speed.</p>
+          <p><strong>Best against:</strong> Swarms of weak threats, bonus: attracts enemies nearby</p>
+        </div>
+
+        <div class="tower-info">
+          <h3>⚡ Patch Server ($50)</h3>
+          <p><strong>Range:</strong> 150px | <strong>Heal Rate:</strong> 5/s | <strong>Active:</strong> During waves only</p>
+          <p>Emergency network restoration system. Restores your network health ONLY during active waves. Place strategically to survive tough encounters.</p>
+          <p><strong>Best for:</strong> Surviving intense wave attacks and healing critical damage</p>
+        </div>
+
+        <div class="strategy-tip">
+          <h3>💡 Strategy Tips</h3>
+          <ul>
+            <li><strong>Layered Defense:</strong> Use multiple tower types together for better coverage</li>
+            <li><strong>Patch Timing:</strong> Patches ONLY heal during waves—use them as emergency healing, not passive recovery</li>
+            <li><strong>Positioning:</strong> Place towers along the path with overlapping ranges for redundancy</li>
+            <li><strong>Enemy Rewards:</strong> Stronger enemies (worms, ransomware) give more credits—kill them efficiently</li>
+            <li><strong>High Heal Rate:</strong> Patches heal 5 times per second during waves—very effective for damage control</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>
