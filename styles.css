@@ -302,6 +302,11 @@ body {
     padding-bottom: 20px;
   }
 
+  /* Increase bottom space further on very small devices so taller canvas can scroll into view */
+  @media (max-height: 420px) {
+    #gameContainer { margin-bottom: 260px; }
+  }
+
   /* Ensure HUD doesn't overlap or stick to top when scrolling */
   #hud {
     position: relative;

@@ -70,6 +70,11 @@ function resizeCanvas() {
     // Landscape: prefer width (allow height to exceed viewport if necessary so the canvas is wide)
     cssWidth = maxCssWidth;
     cssHeight = Math.round(cssWidth / aspect);
+
+    // Stretch vertically a bit more on small landscape devices to give more visible play area
+    if (window.innerWidth <= 900) {
+      cssHeight = Math.round(cssHeight * 1.25); // 25% taller
+    }
   }
 
   // Set camera zoom on small landscape devices to "zoom in" and make the world appear larger
