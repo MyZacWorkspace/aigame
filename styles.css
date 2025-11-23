@@ -298,13 +298,13 @@ body {
   }
 
   #gameContainer {
-    margin-bottom: 160px; /* extra bottom space so users can scroll down farther */
+    margin-bottom: 260px; /* extra bottom space so users can scroll down farther with stretched canvas */
     padding-bottom: 20px;
   }
 
   /* Increase bottom space further on very small devices so taller canvas can scroll into view */
   @media (max-height: 420px) {
-    #gameContainer { margin-bottom: 260px; }
+    #gameContainer { margin-bottom: 360px; }
   }
 
   /* Ensure HUD doesn't overlap or stick to top when scrolling */

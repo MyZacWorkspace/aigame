@@ -71,9 +71,11 @@ function resizeCanvas() {
     cssWidth = maxCssWidth;
     cssHeight = Math.round(cssWidth / aspect);
 
-    // Stretch vertically a bit more on small landscape devices to give more visible play area
+    // Stretch vertically more on small landscape devices to give more visible play area
     if (window.innerWidth <= 900) {
-      cssHeight = Math.round(cssHeight * 1.25); // 25% taller
+      // Scale based on device width: narrower devices get more stretch
+      const stretchFactor = Math.max(1.5, Math.min(2.0, 1200 / window.innerWidth));
+      cssHeight = Math.round(cssHeight * stretchFactor);
     }
   }
 
