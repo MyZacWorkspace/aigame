@@ -339,8 +339,12 @@ class Tower {
 
 // ==================== GAME LOGIC ====================
 
-const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
+// Only initialize game logic in browser environment
+let canvas, ctx;
+if (typeof document !== 'undefined') {
+  canvas = document.getElementById('gameCanvas');
+  ctx = canvas.getContext('2d');
+}
 
 let towers = [];
 let enemies = [];
@@ -697,112 +701,116 @@ function clientToWorld(clientX, clientY) {
   return { x: logical.x / (camera.zoom || 1) + camera.x, y: logical.y / (camera.zoom || 1) + camera.y };
 }
 
-canvas.addEventListener('pointerdown', (e) => {
-  if (gameState.waveActive) return;
+// ==================== EVENT LISTENERS ====================
+// Only setup event listeners in browser
+if (typeof document !== 'undefined' && typeof window !== 'undefined') {
+  canvas.addEventListener('pointerdown', (e) => {
+    if (gameState.waveActive) return;
 
-  if (gameState.selectedTower) {
-    // placing tower
-    const worldPos = clientToWorld(e.clientX, e.clientY);
-    placeTower(worldPos.x, worldPos.y, gameState.selectedTower.type);
-    e.preventDefault();
-    return;
-  }
+    if (gameState.selectedTower) {
+      // placing tower
+      const worldPos = clientToWorld(e.clientX, e.clientY);
+      placeTower(worldPos.x, worldPos.y, gameState.selectedTower.type);
+      e.preventDefault();
+      return;
+    }
 
-  // Start panning
-  isPanning = true;
-  panStart.clientX = e.clientX;
-  panStart.clientY = e.clientY;
-  panStart.camX = camera.x;
-  panStart.camY = camera.y;
-  canvas.setPointerCapture && canvas.setPointerCapture(e.pointerId);
-});
+    // Start panning
+    isPanning = true;
+    panStart.clientX = e.clientX;
+    panStart.clientY = e.clientY;
+    panStart.camX = camera.x;
+    panStart.camY = camera.y;
+    canvas.setPointerCapture && canvas.setPointerCapture(e.pointerId);
+  });
 
-canvas.addEventListener('pointermove', (e) => {
-  if (gameState.selectedTower && !isPanning) {
-    const worldPos = clientToWorld(e.clientX, e.clientY);
-    gameState.selectedTower.x = worldPos.x;
-    gameState.selectedTower.y = worldPos.y;
-    return;
-  }
+  canvas.addEventListener('pointermove', (e) => {
+    if (gameState.selectedTower && !isPanning) {
+      const worldPos = clientToWorld(e.clientX, e.clientY);
+      gameState.selectedTower.x = worldPos.x;
+      gameState.selectedTower.y = worldPos.y;
+      return;
+    }
 
-  if (!isPanning) return;
-  const rect = canvas.getBoundingClientRect();
-  const scaleX = gameConfig.canvasWidth / rect.width;
-  const scaleY = gameConfig.canvasHeight / rect.height;
-  const deltaX = (e.clientX - panStart.clientX) * scaleX;
-  const deltaY = (e.clientY - panStart.clientY) * scaleY;
-  camera.x = panStart.camX - deltaX / (camera.zoom || 1);
-  camera.y = panStart.camY - deltaY / (camera.zoom || 1);
+    if (!isPanning) return;
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = gameConfig.canvasWidth / rect.width;
+    const scaleY = gameConfig.canvasHeight / rect.height;
+    const deltaX = (e.clientX - panStart.clientX) * scaleX;
+    const deltaY = (e.clientY - panStart.clientY) * scaleY;
+    camera.x = panStart.camX - deltaX / (camera.zoom || 1);
+    camera.y = panStart.camY - deltaY / (camera.zoom || 1);
 
-  // Clamp camera to reasonable bounds so we don't pan into infinite emptiness
-  const maxPanX = gameConfig.canvasWidth; // generous bound
-  const maxPanY = gameConfig.canvasHeight;
-  camera.x = Math.max(-maxPanX, Math.min(maxPanX, camera.x));
-  camera.y = Math.max(-maxPanY, Math.min(maxPanY, camera.y));
-});
+    // Clamp camera to reasonable bounds so we don't pan into infinite emptiness
+    const maxPanX = gameConfig.canvasWidth; // generous bound
+    const maxPanY = gameConfig.canvasHeight;
+    camera.x = Math.max(-maxPanX, Math.min(maxPanX, camera.x));
+    camera.y = Math.max(-maxPanY, Math.min(maxPanY, camera.y));
+  });
 
-canvas.addEventListener('pointerup', (e) => {
-  isPanning = false;
-  canvas.releasePointerCapture && canvas.releasePointerCapture(e.pointerId);
-});
+  canvas.addEventListener('pointerup', (e) => {
+    isPanning = false;
+    canvas.releasePointerCapture && canvas.releasePointerCapture(e.pointerId);
+  });
 
-// Prevent default touch behavior on the canvas for better touch gameplay
-canvas.addEventListener('touchstart', (e) => e.preventDefault(), { passive: false });
+  // Prevent default touch behavior on the canvas for better touch gameplay
+  canvas.addEventListener('touchstart', (e) => e.preventDefault(), { passive: false });
 
-document.getElementById('towerBtn').addEventListener('click', () => {
-  gameState.selectedTower = { type: 'firewall', x: 0, y: 0 };
-  showMessage('🔥 Firewall selected - Click to place ($25)');
-});
+  document.getElementById('towerBtn').addEventListener('click', () => {
+    gameState.selectedTower = { type: 'firewall', x: 0, y: 0 };
+    showMessage('🔥 Firewall selected - Click to place ($25)');
+  });
 
-document.getElementById('idsBtn').addEventListener('click', () => {
-  gameState.selectedTower = { type: 'ids', x: 0, y: 0 };
-  showMessage('🕵️ IDS selected - Click to place ($40)');
-});
+  document.getElementById('idsBtn').addEventListener('click', () => {
+    gameState.selectedTower = { type: 'ids', x: 0, y: 0 };
+    showMessage('🕵️ IDS selected - Click to place ($40)');
+  });
 
-document.getElementById('honeypotBtn').addEventListener('click', () => {
-  gameState.selectedTower = { type: 'honeypot', x: 0, y: 0 };
-  showMessage('🪤 Honeypot selected - Click to place ($35)');
-});
+  document.getElementById('honeypotBtn').addEventListener('click', () => {
+    gameState.selectedTower = { type: 'honeypot', x: 0, y: 0 };
+    showMessage('🪤 Honeypot selected - Click to place ($35)');
+  });
 
-document.getElementById('patchBtn').addEventListener('click', () => {
-  gameState.selectedTower = { type: 'patch', x: 0, y: 0 };
-  showMessage('⚡ Patch Server selected - Click to place ($50)');
-});
+  document.getElementById('patchBtn').addEventListener('click', () => {
+    gameState.selectedTower = { type: 'patch', x: 0, y: 0 };
+    showMessage('⚡ Patch Server selected - Click to place ($50)');
+  });
 
-document.getElementById('startWave').addEventListener('click', startWave);
+  document.getElementById('startWave').addEventListener('click', startWave);
 
-document.getElementById('restartBtn').addEventListener('click', () => {
-  resetGameState();
-  document.getElementById('restartBtn').style.display = 'none';
-  showMessage('Game restarted!');
-});
+  document.getElementById('restartBtn').addEventListener('click', () => {
+    resetGameState();
+    document.getElementById('restartBtn').style.display = 'none';
+    showMessage('Game restarted!');
+  });
 
-// Tower Info Modal
-document.getElementById('helpBtn').addEventListener('click', () => {
-  document.getElementById('helpModal').style.display = 'flex';
-});
+  // Tower Info Modal
+  document.getElementById('helpBtn').addEventListener('click', () => {
+    document.getElementById('helpModal').style.display = 'flex';
+  });
 
-document.getElementById('closeModal').addEventListener('click', () => {
-  document.getElementById('helpModal').style.display = 'none';
-});
-
-document.getElementById('helpModal').addEventListener('click', (e) => {
-  if (e.target.id === 'helpModal') {
+  document.getElementById('closeModal').addEventListener('click', () => {
     document.getElementById('helpModal').style.display = 'none';
-  }
-});
+  });
 
-// Initialize the game with first random path
-gameConfig.pathPoints = generateRandomPath();
+  document.getElementById('helpModal').addEventListener('click', (e) => {
+    if (e.target.id === 'helpModal') {
+      document.getElementById('helpModal').style.display = 'none';
+    }
+  });
 
-// Setup resize handling and start
-window.addEventListener('resize', () => {
+  // Initialize the game with first random path
+  gameConfig.pathPoints = generateRandomPath();
+
+  // Setup resize handling and start
+  window.addEventListener('resize', () => {
+    resizeCanvas();
+  });
+  window.addEventListener('orientationchange', () => {
+    setTimeout(resizeCanvas, 200);
+  });
+
+  // Make canvas responsive and start loop
   resizeCanvas();
-});
-window.addEventListener('orientationchange', () => {
-  setTimeout(resizeCanvas, 200);
-});
-
-// Make canvas responsive and start loop
-resizeCanvas();
-gameLoop();
+  gameLoop();
+}
