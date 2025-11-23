@@ -695,6 +695,14 @@ function gameLoop() {
 // Pointer events unify mouse/touch input. Convert client coords -> logical canvas coords.
 let isPanning = false;
 let panStart = { clientX: 0, clientY: 0, camX: 0, camY: 0 };
+let lastTapTime = 0;
+let lastTapPos = { x: 0, y: 0 };
+const doubleTapThreshold = 300; // ms
+const doubleTapDistance = 50; // px
+
+function isTouchDevice() {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
 
 function clientToWorld(clientX, clientY) {
   const logical = clientToLogical(clientX, clientY);
@@ -708,11 +716,35 @@ if (typeof document !== 'undefined' && typeof window !== 'undefined') {
     if (gameState.waveActive) return;
 
     if (gameState.selectedTower) {
-      // placing tower
-      const worldPos = clientToWorld(e.clientX, e.clientY);
-      placeTower(worldPos.x, worldPos.y, gameState.selectedTower.type);
-      e.preventDefault();
-      return;
+      // On mobile: require double-tap to place tower (allow single-tap drag to pan instead)
+      // On desktop: single-click places tower
+      if (isTouchDevice()) {
+        const now = Date.now();
+        const deltaTime = now - lastTapTime;
+        const deltaX = e.clientX - lastTapPos.x;
+        const deltaY = e.clientY - lastTapPos.y;
+        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+        if (deltaTime < doubleTapThreshold && distance < doubleTapDistance) {
+          // Double-tap detected
+          const worldPos = clientToWorld(e.clientX, e.clientY);
+          placeTower(worldPos.x, worldPos.y, gameState.selectedTower.type);
+          e.preventDefault();
+          lastTapTime = 0; // Reset to prevent triple-tap
+          return;
+        }
+
+        // Record this tap
+        lastTapTime = now;
+        lastTapPos.x = e.clientX;
+        lastTapPos.y = e.clientY;
+      } else {
+        // Desktop: single click places tower
+        const worldPos = clientToWorld(e.clientX, e.clientY);
+        placeTower(worldPos.x, worldPos.y, gameState.selectedTower.type);
+        e.preventDefault();
+        return;
+      }
     }
 
     // Start panning
