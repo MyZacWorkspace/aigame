@@ -20,7 +20,7 @@
         <button id="honeypotBtn" class="tower-btn">🪤 Honeypot ($35)</button>
         <button id="patchBtn" class="tower-btn">⚡ Patch ($50)</button>
         <button id="startWave" class="action-btn">▶ Start Wave</button>
-        <button id="helpBtn" class="action-btn" style="background: linear-gradient(135deg, #9b59b6, #8e44ad);">ℹ️ Tower Info</button>
+        <button id="helpBtn" class="action-btn" style="background: linear-gradient(135deg, #9b59b6, #8e44ad);">📖 How To Play</button>
         <button id="restartBtn" class="action-btn" style="display: none; background: linear-gradient(135deg, #ff6b6b, #e94560);">🔄 Restart Game</button>
       </div>
       <div id="message"></div>
@@ -28,14 +28,31 @@
     <canvas id="gameCanvas" width="1000" height="600"></canvas>
   </div>
 
-  <!-- Tower Info Modal -->
+  <!-- How To Play Modal -->
   <div id="helpModal" class="modal" style="display: none;">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>🛡️ Tower Defense Guide</h2>
+        <h2>📖 How To Play: Firewall Frenzy</h2>
         <button class="close-btn" id="closeModal">&times;</button>
       </div>
       <div class="modal-body">
+        
+        <!-- Credits Section -->
+        <div class="strategy-tip">
+          <h3>💰 Credits System</h3>
+          <p>You start with <strong>100 credits</strong> to build your defense network. Use credits to purchase and place towers on the game canvas.</p>
+          <ul>
+            <li><strong>Earning Credits:</strong> Defeat enemies to earn credits. Stronger enemies reward more—viruses give 7, worms give 15, ransomware give 35, etc.</li>
+            <li><strong>Spending Credits:</strong> Each tower costs credits. Plan your purchases wisely to build an effective defense before waves overwhelm you.</li>
+            <li><strong>Resource Management:</strong> Balance spending on defense towers vs. healing towers (Patches). Bankrupt networks fall quickly!</li>
+          </ul>
+        </div>
+
+        <!-- Tower Types Section -->
+        <div class="strategy-tip">
+          <h3>🏛️ Tower Types</h3>
+        </div>
+
         <div class="tower-info">
           <h3>🔥 Firewall ($25)</h3>
           <p><strong>Range:</strong> 120px | <strong>Damage:</strong> 1 | <strong>Fire Rate:</strong> 0.5/s</p>
@@ -64,6 +81,47 @@
           <p><strong>Best for:</strong> Surviving intense wave attacks and healing critical damage</p>
         </div>
 
+        <!-- Enemy Types Section -->
+        <div class="strategy-tip">
+          <h3>👾 Enemy Types</h3>
+        </div>
+
+        <div class="tower-info">
+          <h3>🦠 Virus</h3>
+          <p><strong>Health:</strong> 1 | <strong>Speed:</strong> 2.8 | <strong>Damage:</strong> 1 | <strong>Reward:</strong> 7 credits</p>
+          <p>Fast and weak. Easy to defeat individually, but dangerous in large swarms. Target these early to build up credits quickly.</p>
+          <p><strong>Threat Level:</strong> Low | <strong>Priority:</strong> Medium</p>
+        </div>
+
+        <div class="tower-info">
+          <h3>🐍 Worm</h3>
+          <p><strong>Health:</strong> 2 | <strong>Speed:</strong> 1.7 | <strong>Damage:</strong> 2 | <strong>Reward:</strong> 15 credits</p>
+          <p>Moderately fast with decent health. Deals more damage than viruses and worth more credits. A balanced threat throughout the game.</p>
+          <p><strong>Threat Level:</strong> Medium | <strong>Priority:</strong> High</p>
+        </div>
+
+        <div class="tower-info">
+          <h3>💣 Ransomware</h3>
+          <p><strong>Health:</strong> 4 | <strong>Speed:</strong> 0.8 | <strong>Damage:</strong> 5 | <strong>Reward:</strong> 35 credits</p>
+          <p>Slow but extremely tanky and dangerous. Deals critical damage to your network. Focus fire with multiple towers to eliminate quickly.</p>
+          <p><strong>Threat Level:</strong> CRITICAL | <strong>Priority:</strong> HIGHEST</p>
+        </div>
+
+        <div class="tower-info">
+          <h3>🌐 DDoS</h3>
+          <p><strong>Health:</strong> 1 | <strong>Speed:</strong> 3.5 | <strong>Damage:</strong> 1 | <strong>Reward:</strong> 7 credits</p>
+          <p>Very fast but fragile. Deals light damage but can overwhelm defenses through sheer speed. Use high fire-rate towers like Honeypots.</p>
+          <p><strong>Threat Level:</strong> Medium | <strong>Priority:</strong> Medium</p>
+        </div>
+
+        <div class="tower-info">
+          <h3>🎭 Phishing</h3>
+          <p><strong>Health:</strong> 1 | <strong>Speed:</strong> 2.1 | <strong>Damage:</strong> 1 | <strong>Reward:</strong> 7 credits</p>
+          <p>Deceptive and moderately fast. Weak individually but can slip through defenses. Layer towers to ensure no gaps in coverage.</p>
+          <p><strong>Threat Level:</strong> Low-Medium | <strong>Priority:</strong> Medium</p>
+        </div>
+
+        <!-- Strategy Tips Section -->
         <div class="strategy-tip">
           <h3>💡 Strategy Tips</h3>
           <ul>
@@ -72,8 +130,11 @@
             <li><strong>Positioning:</strong> Place towers along the path with overlapping ranges for redundancy</li>
             <li><strong>Enemy Rewards:</strong> Stronger enemies (worms, ransomware) give more credits—kill them efficiently</li>
             <li><strong>High Heal Rate:</strong> Patches heal 5 times per second during waves—very effective for damage control</li>
+            <li><strong>Mobile Tips:</strong> On mobile, drag to pan the canvas and double-tap to place towers</li>
+            <li><strong>Desktop Tips:</strong> On desktop, single-click to place towers and drag to pan</li>
           </ul>
         </div>
+
       </div>
     </div>
   </div>
