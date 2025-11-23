@@ -378,6 +378,49 @@ const waves = [
     ],
     delay: 0.5,
   },
+  {
+    name: 'Advanced Botnet',
+    enemies: [
+      { type: 'virus', count: 15, delay: 0.15 },
+      { type: 'worm', count: 8, delay: 0.3 },
+      { type: 'ddos', count: 10, delay: 0.2 },
+      { type: 'ransomware', count: 3, delay: 0.8 },
+    ],
+    delay: 0.4,
+  },
+  {
+    name: 'Critical Infrastructure Attack',
+    enemies: [
+      { type: 'virus', count: 20, delay: 0.1 },
+      { type: 'worm', count: 12, delay: 0.25 },
+      { type: 'ddos', count: 20, delay: 0.1 },
+      { type: 'ransomware', count: 5, delay: 0.6 },
+      { type: 'phishing', count: 8, delay: 0.4 },
+    ],
+    delay: 0.35,
+  },
+  {
+    name: 'Coordinated Assault',
+    enemies: [
+      { type: 'virus', count: 25, delay: 0.08 },
+      { type: 'worm', count: 15, delay: 0.2 },
+      { type: 'ddos', count: 30, delay: 0.08 },
+      { type: 'ransomware', count: 8, delay: 0.5 },
+      { type: 'phishing', count: 12, delay: 0.3 },
+    ],
+    delay: 0.3,
+  },
+  {
+    name: 'Apocalypse Now',
+    enemies: [
+      { type: 'virus', count: 35, delay: 0.06 },
+      { type: 'worm', count: 20, delay: 0.15 },
+      { type: 'ddos', count: 50, delay: 0.05 },
+      { type: 'ransomware', count: 12, delay: 0.4 },
+      { type: 'phishing', count: 15, delay: 0.25 },
+    ],
+    delay: 0.25,
+  },
 ];
 
 let waveSpawnQueue = [];
